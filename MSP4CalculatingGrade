@@ -1,0 +1,153 @@
+// Author:  Sami Villatoro
+// Program: Program takes user information of a student, calculates the total grades, "drops" the lowest grade,
+//          calculates the 60/40 weighted grade for work and recall components, then assigns the grade to a letter
+//          as per university guidelines.
+// Created: 12/01/2023
+// Updated: 12/04/2023
+// Pre:     None.
+// Post:    Displays the student's letter grade.
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+const int MAX_SIZE = 4.0;
+
+struct StudentData {
+    string name;
+    double bonusPoints = 0;
+    char letterGrade;
+    double midTerm, finalExam, labCourse,
+           totalGrade, quizTotal, mspTotal;
+    double arrMSP[MAX_SIZE];
+    double arrQ[MAX_SIZE];
+};
+
+// Function gathers the data from the user and sends the data
+// to the StudentData structure for student.
+void getInfo(StudentData &student) {
+    cout << "Enter the student's name: ";
+    getline(cin, student.name);
+    
+    cout << "Enter the student's lab grade: ";
+    cin >> student.labCourse;
+    
+    cout << "Enter the student's Midterm Exam grade: ";
+    cin >> student.midTerm;
+    
+    cout << "Enter the student's Final Exam grade: ";
+    cin >> student.finalExam;
+    
+    int bp;
+    cout << "Enter the student's amount of bonus points between 0 and 30: ";
+    cin >> bp;
+    if (bp >= 0.0 && bp <= 30.0) {
+        student.bonusPoints = bp;
+    } else {
+        cout << "Incorrect number of bonus points.. Bonus Points set to 0. ";
+        student.bonusPoints = 0.0;
+    }
+    
+    for (int i = 0; i < MAX_SIZE; i++) {
+        cout << "Enter Quiz" << i + 1 << " grade: ";
+        cin >> student.arrQ[i];
+    }
+    for (int i = 0; i < MAX_SIZE; i++) {
+        cout << "Enter MSP" << i + 1 << " grade: ";
+        cin >> student.arrMSP[i];
+    }
+}
+
+// Function calculates the total points in the quiz and adjusts it to give full credit to lowest score,
+// then sends the information back to StudentData student.
+double calculateQuizTotal (StudentData &student, const int MAX_SIZE) {
+    double qTotal = 0.0;
+    int minIndex = 0;
+    for (int i = 1; i < MAX_SIZE; i++) {
+        if (student.arrQ[i] < student.arrQ[minIndex]) {
+            minIndex = i;
+        }
+    }
+    
+    student.arrQ[minIndex] = 10.0;
+    
+    for (int j = 0; j < MAX_SIZE; j++) {
+        qTotal += student.arrQ[j];
+    }
+    
+    return qTotal;
+}
+
+// Function calculates the total MSP points and adjusts it to give full credit to the lowest score,
+// then send the information back to StudentData student.
+double calculateMspTotal (StudentData &student, const int MAX_SIZE) {
+    double mspTotal = 0.0;
+    int lowestIndex = 0;
+    for (int i = 1; i < MAX_SIZE; i++) {
+        if (student.arrMSP[i] < student.arrMSP[lowestIndex]) {
+            lowestIndex = i;
+        }
+    }
+    student.arrMSP[lowestIndex] = 20.0;
+    
+    for (int j = 0; j < MAX_SIZE; j++) {
+        mspTotal += student.arrMSP[j];
+    }
+    return mspTotal;
+}
+
+// Function calculates the total grade and separates the recall and work components
+// then finds which component did best and applies the 60/40 weight
+// it send back the total grade by adding the work component, recall component, and bonus points.
+double calculateTotalGrade(StudentData &student) {
+    double tGrade = 0.0;
+    double workComponent = 0.0;
+    double recallComponent = 0.0;
+    
+    workComponent = student.mspTotal + student.labCourse;
+    recallComponent = student.finalExam + student.midTerm + student.quizTotal;
+    
+    if (workComponent > recallComponent) {
+        workComponent *= 0.6;
+        recallComponent *= 0.4;
+    } else {
+        workComponent *= 0.4;
+        recallComponent *= 0.6;
+    }
+    tGrade = workComponent + student.bonusPoints + recallComponent;
+    cout << tGrade; //FIXXXXX TESSSST
+    return tGrade;
+}
+
+// Function takes the total grade from student in struct StudentData and assigns it a letter grade
+// based on the university's grading system.
+char findLetterGrade(StudentData &student) {
+    char letGrade;
+    if (student.totalGrade >= 90.0) {
+        letGrade = 'A';
+    } else if (student.totalGrade >= 80.0) {
+        letGrade = 'B';
+    } else if (student.totalGrade >= 70.0) {
+        letGrade = 'C';
+    } else if (student.totalGrade >= 60.0) {
+        letGrade = 'D';
+    } else {
+        letGrade = 'F';
+    }
+    return letGrade;
+}
+// Main function creates the struct StudentData student, gathers the info for student,
+// calls functions to fill in calculations to store in StudentData struct for student,
+// then displays the student's name and their final letter grade.
+int main () {
+    StudentData student;
+    getInfo(student);
+    student.quizTotal = calculateQuizTotal(student, MAX_SIZE);      // Calls calculateQuizTotal function to find student.quizTotal
+    student.mspTotal = calculateMspTotal(student, MAX_SIZE);        // Calls the calculateMspTotal function to find student.mspTotal
+    student.totalGrade = calculateTotalGrade(student);    // Calls the calculateTotalGrade function to find student.totalGrade
+    student.letterGrade = findLetterGrade(student);       // Calls the findLetterGrade function to find student.letterGrade
+    
+    cout << student.name << "'s grade is an " << student.letterGrade << endl; // Displays the name of student and their letter grade
+    
+    return 0;
+}
