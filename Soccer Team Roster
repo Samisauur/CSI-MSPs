@@ -1,0 +1,72 @@
+// Program: Locates and displays player's information
+// Author: Sami Villatoro
+// Created Feb. 06, 2024.
+
+#include <iostream>
+using namespace std;
+struct Player {
+    string name;                // Player name
+    int jerseyNum;                    // Player jersey number
+    int rating;                 // Player rating
+};
+const int SIZE = 5;
+
+void updateRating (Player t[], int playerJersy, int playerRating) {
+    for (int i = 0; i < SIZE; i++) {
+        if (t[i].jerseyNum == playerJersy) {
+            t[i].rating = playerRating;
+            break;
+        }
+    }
+}
+
+void aboveRating (Player t[], int playerRating) {
+    cout << endl << "ABOVE " << playerRating << endl;
+    for (int i = 0; i < SIZE; i++) {
+        if (t[i].rating > playerRating) {
+            cout << t[i].name 
+            << " -- "
+            << "Jersey number: "
+            << t[i].jerseyNum 
+            << ", "
+            << "Rating: "
+            << t[i].rating
+            << endl;
+        }
+    }
+}
+int main() {
+
+  Player t[SIZE] = {
+        {"Lloyd", 10, 8},
+        {"Pugh",11, 5},
+        {"Morgan",13, 7},
+        {"Rapinoe",15, 5},
+        {"Dunn",19, 6}
+    };
+    
+    
+    int playerJersey, playerRating;
+    cout << "Update player rating, enter -1 to quit: " << endl;
+    while (true) {
+        cout << "Enter a jersey number:" << endl;
+        cin >> playerJersey;
+        
+        if (playerJersey == -1) {
+            break;
+        }
+        
+        cout << "Enter a new rating for player:" << endl;
+        cin >> playerRating;
+        
+        updateRating(t, playerJersey, playerRating);
+    }
+    int userRating;
+    cout << "Enter a rating:" << endl;
+    cin >> userRating;
+    
+    aboveRating (t, userRating);
+     /* Type your code here. */
+
+   return 0;
+}
